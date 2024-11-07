@@ -1,13 +1,33 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
+const cors = require('cors');
+const cookieParser = require('cookie-parser')
 
 // PORT number of server
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
-// define route
-app.get('/', (req, res) => {
-    res.send("Welcome in Chat web");
-});
+// Connect to MongoDB database 
+const DbConnection = require('./config/DbConnection');
+DbConnection();
+
+// Middlewares...
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(cors(
+    {
+        origin: 'http://localhost:5173',
+        credentials: true, // Allow cookies to be sent 
+    }
+));
+
+
+// Routes...
+const UserRoutes = require("./routes/UserRoutes");
+
+app.use("/user", UserRoutes);
+
 
 // Start the Server
 app.listen(PORT, () => {
