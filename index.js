@@ -25,8 +25,10 @@ app.use(cors(
 
 // Routes...
 const UserRoutes = require("./routes/UserRoutes");
+const ChatRoutes = require("./routes/ChatRoutes");
 
 app.use("/user", UserRoutes);
+app.use("/chat", ChatRoutes);
 
 
 // Start the Server
