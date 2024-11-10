@@ -1,5 +1,6 @@
 const User = require("../modles/UserSchema");
 const jwt = require('jsonwebtoken');
+const mongoose = require("mongoose");
 const bcrypt = require('bcrypt')
 const uploadToCloudinary = require('../config/Cloudinary');
 const sendOTP = require('../config/NodeMailer');
@@ -358,7 +359,55 @@ const logout = async (_, res) => {
     }
 }
 
+const getAllUsers = async (req, res) => {
+    try {
+        const userId = req.user;
+
+        // fetch all users except user itself
+        const allUsers = await User.find({ _id: { $ne: new mongoose.Types.ObjectId(userId) } }).select("userName nickName avatarUrl")
+
+        return res.status(200).json({
+            message: 'Fetch all users successfully',
+            success: true,
+            allUsers: allUsers
+        })
+    } catch (error) {
+        console.log("Error in  getAllUsers:", error);
+    }
+}
+
+const searchUser = async (req, res) => {
+    try {
+        const userId = req.user;
+        const { search } = req.body;
+
+        // atleast three words required for search
+        if (!search.trim().length > 3) {
+            return res.status(400).json({
+                message: 'Atleast give three words for search',
+                success: false,
+            })
+        }
+
+        // find all users which start with 'search' value (userName or nickName) & caseInsensitive
+        const users = await User.find({
+            $or: [
+                { userName: { $regex: search, $options: 'i' } },
+                { nickName: { $regex: search, $options: 'i' } }
+            ]
+        }).select("userName nickName avatarUrl")
+
+        return res.status(200).json({
+            message: 'Users fetched',
+            success: true,
+            users: users
+        })
+
+    } catch (error) {
+        console.log("Error in searchUser:", error)
+    }
+}
 
 module.exports = {
-    signup, signin, updateUser, verifyOtpForForgetPassword, updateForgetPassword, logout,
+    signup, signin, updateUser, verifyOtpForForgetPassword, updateForgetPassword, logout, getAllUsers, searchUser
 }

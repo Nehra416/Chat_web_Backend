@@ -26,9 +26,11 @@ app.use(cors(
 // Routes...
 const UserRoutes = require("./routes/UserRoutes");
 const ChatRoutes = require("./routes/ChatRoutes");
+const ArchivedRoutes = require("./routes/ArchivedRoutes");
 
 app.use("/user", UserRoutes);
 app.use("/chat", ChatRoutes);
+app.use("/archived", ArchivedRoutes);
 
 
 // Start the Server
